@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ledgermem-status",
+  "main": "src/worker.ts",
+  "compatibility_date": "2025-09-24",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Custom domain at status.proofly.dev — bind via Cloudflare dashboard
+  // after `wrangler deploy`.
+  "routes": [
+    { "pattern": "status.proofly.dev/*", "zone_name": "proofly.dev" }
+  ],
+
+  // KV stores the last 30 days of samples. Provision once with:
+  //   wrangler kv:namespace create STATUS
+  //   then paste the returned `id` below.
+  "kv_namespaces": [
+    { "binding": "STATUS", "id": "REPLACE_ME_AT_DEPLOY" }
+  ],
+
+  // Run health checks every minute.
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
+
+  "vars": {
+    "TARGETS": "[{\"name\":\"API\",\"url\":\"https://api.proofly.dev/health/ready\"},{\"name\":\"Dashboard\",\"url\":\"https://app.proofly.dev/healthz\"},{\"name\":\"Marketing\",\"url\":\"https://proofly.dev\"},{\"name\":\"MCP\",\"url\":\"https://mcp.proofly.dev/healthz\"}]"
+  },
+
+  "observability": { "enabled": true }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "ledgermem-status",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal Cloudflare Worker that runs health checks and exposes a Statuspage.io-compatible /api/v2/status.json. Serves an HTML status page at status.proofly.dev.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^3.95.0"
+  }
+}

@@ -80,8 +80,13 @@ function shouldSkipProbe(samples: Sample[]): boolean {
   }
   if (consecutiveFails < 10) return false
   // After 10 fails, only probe every Nth tick where N grows logarithmically.
-  const stride = Math.min(5, Math.floor(Math.log2(consecutiveFails)))
-  return samples.length % stride !== 0
+  // Use the failure count as the tick counter — `samples.length` was previously
+  // used, but when we *skip* a tick we don't append to samples, so the length
+  // never advances and the worker would skip every subsequent tick forever
+  // (target stays "down" with no new probes). Using consecutiveFails advances
+  // by one each tick a sample is recorded, which is the behavior we want.
+  const stride = Math.max(2, Math.min(5, Math.floor(Math.log2(consecutiveFails))))
+  return consecutiveFails % stride !== 0
 }
 
 async function probe(t: Target): Promise<Sample> {

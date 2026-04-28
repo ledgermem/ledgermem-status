@@ -39,7 +39,12 @@ export default {
     if (url.pathname === '/api/v2/components.json') return componentsJson(env)
     if (url.pathname === '/' || url.pathname === '/index.html')
       return new Response(await renderHtml(env), {
-        headers: { 'content-type': 'text/html; charset=utf-8' },
+        headers: {
+          'content-type': 'text/html; charset=utf-8',
+          // Probes only run once a minute; serve the page from edge cache for
+          // 30s so a Twitter spike doesn't burst-read KV on every visit.
+          'cache-control': 'public, max-age=30, s-maxage=30',
+        },
       })
     return new Response('Not found', { status: 404 })
   },
@@ -53,13 +58,30 @@ async function runProbes(env: Env): Promise<void> {
   const targets = parseTargets(env.TARGETS)
   await Promise.all(
     targets.map(async (t) => {
-      const sample = await probe(t)
       const key = `samples:${t.name}`
       const existing = (await env.STATUS.get(key, 'json')) as Sample[] | null
+      // Probabilistic backoff: after N consecutive failures, skip some probe
+      // ticks so a target that has been down for 10+ minutes doesn't keep
+      // getting pinged at 1/min — we still get one sample per ~5 minutes.
+      if (shouldSkipProbe(existing ?? [])) return
+      const sample = await probe(t)
       const next = [...(existing ?? []), sample].slice(-SAMPLES_PER_TARGET)
       await env.STATUS.put(key, JSON.stringify(next))
     }),
   )
+}
+
+function shouldSkipProbe(samples: Sample[]): boolean {
+  // Count trailing consecutive failures.
+  let consecutiveFails = 0
+  for (let i = samples.length - 1; i >= 0; i -= 1) {
+    if (samples[i]!.ok) break
+    consecutiveFails += 1
+  }
+  if (consecutiveFails < 10) return false
+  // After 10 fails, only probe every Nth tick where N grows logarithmically.
+  const stride = Math.min(5, Math.floor(Math.log2(consecutiveFails)))
+  return samples.length % stride !== 0
 }
 
 async function probe(t: Target): Promise<Sample> {

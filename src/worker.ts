@@ -1,5 +1,5 @@
 /**
- * status.proofly.dev — Cloudflare Worker.
+ * status.getmnemo.xyz — Cloudflare Worker.
  *
  * Two responsibilities:
  *   1. Run a probe of every TARGETS entry once a minute (cron trigger),
@@ -165,9 +165,9 @@ async function statusJson(env: Env): Promise<Response> {
   return json(
     {
       page: {
-        id: 'ledgermem',
-        name: 'LedgerMem',
-        url: 'https://status.proofly.dev',
+        id: 'getmnemo',
+        name: 'Mnemo',
+        url: 'https://status.getmnemo.xyz',
         time_zone: 'UTC',
         updated_at: new Date().toISOString(),
       },
@@ -241,7 +241,7 @@ async function renderHtml(env: Env): Promise<string> {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LedgerMem Status</title>
+<title>Mnemo Status</title>
 <style>
   :root { color-scheme: light dark; }
   body { font: 16px/1.5 ui-sans-serif, system-ui, sans-serif; max-width: 720px; margin: 4rem auto; padding: 0 1rem; }
@@ -261,7 +261,7 @@ async function renderHtml(env: Env): Promise<string> {
 </style>
 </head>
 <body>
-  <h1>LedgerMem Status</h1>
+  <h1>Mnemo Status</h1>
   <p><span class="pill ${worst}">${DESCRIPTION[worst]}</span></p>
 
   <table>
@@ -280,7 +280,7 @@ async function renderHtml(env: Env): Promise<string> {
     </tbody>
   </table>
 
-  <p style="margin-top:3rem"><small>Probed every 60 seconds. <a href="/api/v2/status.json">JSON</a> · <a href="/api/v2/components.json">components.json</a> · <a href="https://proofly.dev">proofly.dev</a></small></p>
+  <p style="margin-top:3rem"><small>Probed every 60 seconds. <a href="/api/v2/status.json">JSON</a> · <a href="/api/v2/components.json">components.json</a> · <a href="https://getmnemo.xyz">getmnemo.xyz</a></small></p>
 </body>
 </html>`
 }

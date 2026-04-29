@@ -1,8 +1,8 @@
 {
-  "name": "ledgermem-status",
+  "name": "getmnemo-status",
   "version": "0.1.0",
   "private": true,
-  "description": "Minimal Cloudflare Worker that runs health checks and exposes a Statuspage.io-compatible /api/v2/status.json. Serves an HTML status page at status.proofly.dev.",
+  "description": "Minimal Cloudflare Worker that runs health checks and exposes a Statuspage.io-compatible /api/v2/status.json. Serves an HTML status page at status.getmnemo.xyz.",
   "type": "module",
   "license": "MIT",
   "scripts": {
